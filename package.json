@@ -1,0 +1,23 @@
+{
+  "name": "content_scraper",
+  "version": "0.0.1",
+  "description": "Scrapes website and stores data to CSV",
+  "main": "scraper.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "scrape",
+    "scraper",
+    "csv",
+    "node",
+    "nodejs"
+  ],
+  "author": "Reid Young",
+  "license": "MIT",
+  "dependencies": {
+    "fs": "0.0.1-security",
+    "json2csv": "^3.7.3",
+    "x-ray": "^2.3.2"
+  }
+}

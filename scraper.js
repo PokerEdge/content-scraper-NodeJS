@@ -21,11 +21,8 @@ const Xray = require('x-ray');
 const json2csv = require('json2csv');
 const fs = require('fs');
 
-// Check for a folder called ‘data’. If the folder doesn’t exist, create one. If the folder does exist, the scraper should do nothing.
-  //Done by using fs module and a string name for a dir(ectory) called 'data' to check for
-    //the folder and to make the folder if it does not exist.
+//Check for director named 'data'. If directory does not exist, create directory.
 const dir = './data';
-
 if (!fs.existsSync(dir)){
     fs.mkdirSync(dir);
 }

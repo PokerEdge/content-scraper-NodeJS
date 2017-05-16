@@ -35,10 +35,10 @@ const shirtURL = "http://www.shirts4mike.com/shirt.php?id=101";
 
 //For each product, get the PRICE TITLE URL & IMAGEURL from the product page
 
-x(productPageURL, {
+const title = x(productPageURL, {
   // price: x(shirtURL, {price: '.price'}),
   title: 'title'
-  // url: '.products @href'
+  // url: 'a'
 })(function(err, obj){
   console.log(obj.title);
 
@@ -47,14 +47,39 @@ x(productPageURL, {
       //Display message to user (in console)
     //Send err to error log file with time stamp
 })
-//WRITES OUTPUT TO JSON FILE
+//WRITES OUTPUT TO JSON FILE AND THIS IS WHERE json2csv WOULD BE USED
 // .write('results.json');
 
-x(productPageURL, {
 
-})(function(err, obj){
+x(productPageURL, '.products a',
+  [{
+    // a: '',
+    href: '@href',
+    imageURL: 'img@src'
+  }]
+)(function(err, obj){
 
+  //On error
+    //If needed, convert error to user friendly message
+      //Display message to user (in console)
+    //Send err to error log file with time stamp
+
+  for(let i=0; i<obj.length; i++){
+    console.log(obj[i].href + " " + obj[i].imageURL);
+    //  + "\n" + obj[i].price
+    //prints http://shirts4mike.com/shirt.php?id=101,http://shirts4mike.com/shirt.php?id=102, etc.
+
+    x(obj[i].href, '.price')(function(err, obj){
+
+      //On error
+        //If needed, convert error to user friendly message
+          //Display message to user (in console)
+        //Send err to error log file with time stamp
+      console.log(obj);
+    })
+  }
 })
+
 
 // x(productPageURL, {
 //   price: x(),

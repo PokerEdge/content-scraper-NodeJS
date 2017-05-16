@@ -28,6 +28,43 @@ if (!fs.existsSync(dir)){
 }
 
 // Get the price, title, url and image url from the product page
+const x = Xray();
+const productPageURL = "http://shirts4mike.com/shirts.php";
+
+const shirtURL = "http://www.shirts4mike.com/shirt.php?id=101";
+
+//For each product, get the PRICE TITLE URL & IMAGEURL from the product page
+
+x(productPageURL, {
+  // price: x(shirtURL, {price: '.price'}),
+  title: 'title'
+  // url: '.products @href'
+})(function(err, obj){
+  console.log(obj.title);
+
+  //On error
+    //If needed, convert error to user friendly message
+      //Display message to user (in console)
+    //Send err to error log file with time stamp
+})
+//WRITES OUTPUT TO JSON FILE
+// .write('results.json');
+
+x(productPageURL, {
+
+})(function(err, obj){
+
+})
+
+// x(productPageURL, {
+//   price: x(),
+//   title: '.title',
+//   url: ,
+//   imageURL: ,
+// });
+
+
+
 // Export product data to CSV file in dir './data' in a particular order (see below)
   //The information should be stored in an CSV file that is named for the date it was created
   //e.g. 2016-11-21.csv

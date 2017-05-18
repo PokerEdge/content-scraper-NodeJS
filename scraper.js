@@ -41,32 +41,42 @@ x(productPageURL, '.products a', //NEED <TITLE> INNER TEXT FROM PRODUCT PAGE
     //If needed, convert error to user friendly message
       //Display message to user (in console)
     //Send err to error log file with time stamp
-
+  // console.log(obj);
   for(let i=0; i<obj.length; i++){
-    console.log(obj[i].href + " " + obj[i].imageURL + " " + obj[i].productTitle);
 
+    console.log(obj[i].href + " \n\n" + obj[i].imageURL + "\n");
 
-    //  + "\n" + obj[i].price
-    //prints http://shirts4mike.com/shirt.php?id=101,http://shirts4mike.com/shirt.php?id=102, etc.
-
-    x(obj[i].href,'.price')(function(err, obj){ //This should scrape both price and title to keep matched data
-
-      //On error
-        //If needed, convert error to user friendly message
-          //Display message to user (in console)
-        //Send err to error log file with time stamp
-      console.log(obj);
-      productPrice.push(obj);
-      console.log(productPrice);
+    x(obj[i].href, 'html', //NEED <TITLE> INNER TEXT FROM PRODUCT PAGE
+      [{
+        title: 'title',
+        price: '.price'
+      }]
+    )(function(err, obj){
+        console.log(obj);
+          console.log(i + obj[i].title +" \n" + obj[i].price + "\n");
     })
 
-    x(obj[i].href,'title')(function(err, obj){
-
-
-      console.log(obj + " title number " + (i+1));
-      pageTitle.push(obj);
-      console.log(pageTitle);
-    })
+    //
+    // x(obj[i].href,'.price')(function(err, obj){
+    //
+    //   //This should scrape both price and title to keep matched data
+    //
+    //   //On error
+    //     //If needed, convert error to user friendly message
+    //       //Display message to user (in console)
+    //     //Send err to error log file with time stamp
+    //   console.log(obj);
+    //   productPrice.push(obj);
+    //   console.log(productPrice);
+    // })
+    //
+    // x(obj[i].href, 'title')(function(err, obj){
+    //
+    //
+    //   console.log(obj + " title number " + (i+1));
+    //   pageTitle.push(obj);
+    //   console.log(pageTitle);
+    // })
   }
 })
 

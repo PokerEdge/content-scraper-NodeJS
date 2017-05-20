@@ -1,3 +1,5 @@
+'use strict';
+
 //If you’re shooting for the "Exceeds Expectations" grade, it is recommended that you mention so in your submission notes.
 
 
@@ -14,13 +16,9 @@ if (!fs.existsSync(dir)){
     fs.mkdirSync(dir);
 }
 
-//Storing asychronous and unorganized data that doesn't match by index
-let productPrice = [];
-let pageTitle = [];
-let productURL = [];
-let imageURL = [];
-
-let CSVData = [productPrice, pageTitle, productURL, imageURL];
+//Fields should be in this order: Title, Price, ImageURL, URL, and Time
+let fields = [];
+// ['Title', 'Price', 'ImageURL', 'URL', 'Time'];
 
 // Get the price, title, url and image url from the product page
 const x = Xray();
@@ -30,74 +28,74 @@ const productPageURL = "http://shirts4mike.com/shirts.php";
 // .write('results.json');
 
 
-x(productPageURL, '.products a', //NEED <TITLE> INNER TEXT FROM PRODUCT PAGE
+x(productPageURL, '.products a',
   [{
-    href: '@href',
-    imageURL: 'img@src'
+    'Title': x('.products a@href', 'title'),
+    'Price': x('.products a@href', '.price'),
+    'ImageURL': 'img@src',
+    'URL': '@href'
   }]
 )(function(err, obj){
+
 
   //On error
     //If needed, convert error to user friendly message
       //Display message to user (in console)
     //Send err to error log file with time stamp
-  // console.log(obj);
-  for(let i=0; i<obj.length; i++){
 
-    console.log(obj[i].href + " \n\n" + obj[i].imageURL + "\n");
+    //They should be in this order: Title, Price, ImageURL, URL, and Time
+    for(let i=0; i<obj.length; i++){
 
-    x(obj[i].href, 'html', //NEED <TITLE> INNER TEXT FROM PRODUCT PAGE
-      [{
-        title: 'title',
-        price: '.price'
-      }]
-    )(function(err, obj){
-        console.log(obj);
-          console.log(i + obj[i].title +" \n" + obj[i].price + "\n");
-    })
+      //Store values as an array of objects JSON to be added to CSV row, e.g.
+      /*
+              var myCars = [
+          {
+            "car": "Audi",
+            "price": 40000,
+            "color": "blue"
+          }, {
+            "car": "BMW",
+            "price": 35000,
+            "color": "black"
+          }, {
+            "car": "Porsche",
+            "price": 60000,
+            "color": "green"
+          }
+        ];
+      */
 
-    //
-    // x(obj[i].href,'.price')(function(err, obj){
-    //
-    //   //This should scrape both price and title to keep matched data
-    //
-    //   //On error
-    //     //If needed, convert error to user friendly message
-    //       //Display message to user (in console)
-    //     //Send err to error log file with time stamp
-    //   console.log(obj);
-    //   productPrice.push(obj);
-    //   console.log(productPrice);
-    // })
-    //
-    // x(obj[i].href, 'title')(function(err, obj){
-    //
-    //
-    //   console.log(obj + " title number " + (i+1));
-    //   pageTitle.push(obj);
-    //   console.log(pageTitle);
-    // })
-  }
+      /*
+      let shirtInfo = {};
+                shirtInfo.Title = title;
+                shirtInfo.Price = price;
+                shirtInfo.ImageUrl = relativeImageUrl;
+                shirtInfo.Url = imageUrl;
+                shirtInfo.Time = scrapeTime;
+      */
+
+      fields.push(obj[i]); //NOT LOADING KEY VALUE PAIRS SYNCHRONOUSLY
+
+      // console.log(obj[i].href);
+      // console.log(obj[i].imageURL);
+      // console.log(obj[i].title);
+      // console.log(obj[i].price);
+
+      // console.log(obj[i]);
+
+      //Make new line in CSV
+    }
+
+    console.log(fields);
+
+    let csvName = new Date().getFullYear().toString() + "-" + (new Date().getMonth()+1).toString() + "-" + new Date().getDate().toString();
+    console.log(csvName);
 })
-
-//Build arrays for each data type to be thrown into CSV
-
-
-
-// x(productPageURL, {
-//   price: x(),
-//   title: '.title',
-//   url: ,
-//   imageURL: ,
-// });
-
-
 
 // Export product data to CSV file in dir './data' in a particular order (see below)
   //The information should be stored in an CSV file that is named for the date it was created
-  //e.g. 2016-11-21.csv
-    //Use built-in JS Date object and then parse the current date's year month
-      //and day to create the file name
+  //e.g. 2016-11-21.csv (year-month-day.csv)
+    //Done
 
 // Assume that the the column headers in the CSV need to be in a certain order
   // to be correctly entered into a database.
@@ -114,7 +112,7 @@ x(productPageURL, '.products a', //NEED <TITLE> INNER TEXT FROM PRODUCT PAGE
   //wifi on your computer or device.
 
 
-// Edit your package.json file so that your program runs when the npm start command is run.
+// Edit your package.json file so that your program runs when the 'npm start' command is run.
 
 
 // When an error occurs, log it to a file named scraper-error.log .

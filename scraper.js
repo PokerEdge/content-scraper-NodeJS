@@ -9,6 +9,8 @@
 const Xray = require('x-ray');
 const json2csv = require('json2csv');
 const fs = require('fs');
+const async = require('async');
+const schedule = require('node-schedule');
 
 //Check for director named 'data'. If directory does not exist, create directory.
 const dir = './data';
@@ -76,21 +78,35 @@ x(productPageURL, '.products a',
 
       fields.push(obj[i]); //NOT LOADING KEY VALUE PAIRS SYNCHRONOUSLY
 
-      // console.log(obj[i].href);
-      // console.log(obj[i].imageURL);
-      // console.log(obj[i].title);
-      // console.log(obj[i].price);
+      let CSVFields = ['field1', 'field2', 'field3'];
+// ['Title', 'Price', 'ImageURL', 'URL', 'Time'];
+
+      console.log('\n');
+      console.log(obj[i].Title);
+      console.log(obj[i].Price);
+      console.log(obj[i].ImageURL);
+      console.log(obj[i].URL);
+      // console.log(obj[i].Time);
+
 
       // console.log(obj[i]);
 
       //Make new line in CSV
     }
 
-    console.log(fields);
 
-    let csvName = new Date().getFullYear().toString() + "-" + (new Date().getMonth()+1).toString() + "-" + new Date().getDate().toString();
-    console.log(csvName);
+    let currentDate = new Date();
+    let csvName = currentDate.getFullYear().toString() + "-" + (currentDate.getMonth()+1).toString() + "-" + currentDate.getDate().toString();
+    fields.push(csvName);
+    console.log(fields[fields.length - 1] + '.csv'); //shows currentDate.csv
+    fs.writeFileSync(`./data/${csvName}.csv`, "Pass CSV data there");
+
 })
+
+
+// ./data/${fields[fields.length - 1]}.csv
+
+// fs.open(fields[fields.length - 1] + '.csv')
 
 // Export product data to CSV file in dir './data' in a particular order (see below)
   //The information should be stored in an CSV file that is named for the date it was created
@@ -103,6 +119,7 @@ x(productPageURL, '.products a',
 
 // If your program is run twice
   // overwrite the data in the CSV file with the updated information.
+    //Done. This happens by default
 
 // If http://shirts4mike.com is down, an error message describing the issue
   //should appear in the console.
@@ -113,6 +130,7 @@ x(productPageURL, '.products a',
 
 
 // Edit your package.json file so that your program runs when the 'npm start' command is run.
+  // Done by writing script into package.json (change so that nodemon does not run app)
 
 
 // When an error occurs, log it to a file named scraper-error.log .

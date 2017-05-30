@@ -4,7 +4,7 @@
   "description": "Scrapes website and stores data to CSV",
   "main": "scraper.js",
   "scripts": {
-    "start" : "nodemon scraper.js"
+    "start": "node scraper.js"
   },
   "keywords": [
     "scrape",
@@ -16,13 +16,9 @@
   "author": "Reid Young",
   "license": "MIT",
   "dependencies": {
-    "async": "^2.4.0",
     "fs": "0.0.1-security",
     "json2csv": "^3.7.3",
     "node-schedule": "^1.2.2",
     "x-ray": "^2.3.2"
-  },
-  "devDependencies": {
-    "nodemon": "^1.11.0"
   }
 }

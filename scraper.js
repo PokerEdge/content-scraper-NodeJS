@@ -9,7 +9,6 @@
 const Xray = require('x-ray');
 const json2csv = require('json2csv');
 const fs = require('fs');
-const async = require('async');
 const schedule = require('node-schedule');
 
 //Check for director named 'data'. If directory does not exist, create directory.
@@ -21,6 +20,8 @@ if (!fs.existsSync(dir)){
 //Fields should be in this order: Title, Price, ImageURL, URL, and Time
 let fields = [];
 // ['Title', 'Price', 'ImageURL', 'URL', 'Time'];
+
+// let itemRow = {};
 
 // Get the price, title, url and image url from the product page
 const x = Xray();
@@ -37,76 +38,56 @@ x(productPageURL, '.products a',
     'ImageURL': 'img@src',
     'URL': '@href'
   }]
-)(function(err, obj){
+)((err, obj) => {
 
-
+  let currentDate = new Date();
+  // let momentDate = moment();
   //On error
+  if(err){
+    // err.code = "400";
+    ////On 404 do the below
+      //Create error file if it doesn't exist
+        //Done with fs.appendFileSync() by default
+      //Use fs.appendFileSync(file, data[, options]) to append to line in file
+        // fs.appendFileSync(`./data/${csvName}.csv`, JSON.stringify(fields)); //For error log
+
     //If needed, convert error to user friendly message
       //Display message to user (in console)
+    console.error(`Oops! There was an error: (${err.statusCode})`);
     //Send err to error log file with time stamp
+      // [Tue Feb 16 2016 10:02:12 GMT-0800 (PST)] <error message>
 
-    //They should be in this order: Title, Price, ImageURL, URL, and Time
-    for(let i=0; i<obj.length; i++){
+    fs.appendFileSync(`./data/scraper-error.log`, `[${currentDate.toString()}] <${err.code}>`);
 
-      //Store values as an array of objects JSON to be added to CSV row, e.g.
-      /*
-              var myCars = [
-          {
-            "car": "Audi",
-            "price": 40000,
-            "color": "blue"
-          }, {
-            "car": "BMW",
-            "price": 35000,
-            "color": "black"
-          }, {
-            "car": "Porsche",
-            "price": 60000,
-            "color": "green"
-          }
-        ];
-      */
+    return;
+    // Current output: [Tue May 30 2017 08:37:29 GMT-0400 (EDT)] <ENOTFOUND>
+    // Required output: [Tue Feb 16 2016 10:02:12 GMT-0800 (PST)] <error message>
+  }
 
-      /*
-      let shirtInfo = {};
-                shirtInfo.Title = title;
-                shirtInfo.Price = price;
-                shirtInfo.ImageUrl = relativeImageUrl;
-                shirtInfo.Url = imageUrl;
-                shirtInfo.Time = scrapeTime;
-      */
+  //They should be in this order: Title, Price, ImageURL, URL, and Time
+  for(let i=0; i<obj.length; i++){
 
-      fields.push(obj[i]); //NOT LOADING KEY VALUE PAIRS SYNCHRONOUSLY
+    // ['Title', 'Price', 'ImageURL', 'URL', 'Time'];
 
-      let CSVFields = ['field1', 'field2', 'field3'];
-// ['Title', 'Price', 'ImageURL', 'URL', 'Time'];
+    //On 200 do all the below
+    let csvName = currentDate.getFullYear().toString() + "-" +
+                 (currentDate.getMonth()+1).toString() + "-" +
+                  currentDate.getDate().toString();
 
-      console.log('\n');
-      console.log(obj[i].Title);
-      console.log(obj[i].Price);
-      console.log(obj[i].ImageURL);
-      console.log(obj[i].URL);
-      // console.log(obj[i].Time);
+    //ONLY last row is assigned at end of loop
+    let itemRow = {};
+    itemRow.title = obj[i].Title;
+    itemRow.price = obj[i].Price;
+    itemRow.imageURL = obj[i].ImageURL;
+    itemRow.url = obj[i].URL;
+    itemRow.time = csvName;
 
+    fields.push(itemRow);
 
-      // console.log(obj[i]);
+    fs.writeFileSync(`./data/${csvName}.csv`, JSON.stringify(fields)); //Code needs to append to line in file and use json2csv
 
-      //Make new line in CSV
-    }
-
-
-    let currentDate = new Date();
-    let csvName = currentDate.getFullYear().toString() + "-" + (currentDate.getMonth()+1).toString() + "-" + currentDate.getDate().toString();
-    fields.push(csvName);
-    console.log(fields[fields.length - 1] + '.csv'); //shows currentDate.csv
-    fs.writeFileSync(`./data/${csvName}.csv`, "Pass CSV data there");
-
+   }
 })
-
-
-// ./data/${fields[fields.length - 1]}.csv
-
-// fs.open(fields[fields.length - 1] + '.csv')
 
 // Export product data to CSV file in dir './data' in a particular order (see below)
   //The information should be stored in an CSV file that is named for the date it was created
@@ -135,4 +116,5 @@ x(productPageURL, '.products a',
 
 // When an error occurs, log it to a file named scraper-error.log .
   //It should append to the bottom of the file with a time stamp and error
+    //May need to use a different write method for editing a single file
   //e.g. [Tue Feb 16 2016 10:02:12 GMT-0800 (PST)] <error message>

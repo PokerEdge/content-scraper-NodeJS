@@ -18,19 +18,13 @@ if (!fs.existsSync(dir)){
 }
 
 //Fields should be in this order: Title, Price, ImageURL, URL, and Time
+let csvFields = ['Title', 'Price', 'ImageURL', 'URL', 'Time'];
 let fields = [];
-// ['Title', 'Price', 'ImageURL', 'URL', 'Time'];
 
-// let itemRow = {};
-
-// Get the price, title, url and image url from the product page
 const x = Xray();
 const productPageURL = "http://shirts4mike.com/shirts.php";
 
-//WRITES OUTPUT TO JSON FILE AND THIS IS WHERE json2csv WOULD BE USED
-// .write('results.json');
-
-
+// Get the price, title, url and image url from the product page
 x(productPageURL, '.products a',
   [{
     'Title': x('.products a@href', 'title'),
@@ -41,58 +35,83 @@ x(productPageURL, '.products a',
 )((err, obj) => {
 
   let currentDate = new Date();
-  // let momentDate = moment();
-  //On error
+
+  //Handle error
   if(err){
-    // err.code = "400";
-    ////On 404 do the below
-      //Create error file if it doesn't exist
+    //On 404 do the below
+      //Create error file if error file doesn't exist
         //Done with fs.appendFileSync() by default
-      //Use fs.appendFileSync(file, data[, options]) to append to line in file
-        // fs.appendFileSync(`./data/${csvName}.csv`, JSON.stringify(fields)); //For error log
+
 
     //If needed, convert error to user friendly message
-      //Display message to user (in console)
-    console.error(`Oops! There was an error: (${err.statusCode})`);
-    //Send err to error log file with time stamp
-      // [Tue Feb 16 2016 10:02:12 GMT-0800 (PST)] <error message>
 
+    //Display error message to user (in console)
+    console.error(`There’s been an error: ${err.code}. Cannot connect to ${productPageURL}.`);
+    // console.error(`Oops! There was an error: (${err.code})`);
+
+    //Send err to error log file with time stamp
+      //[Tue Feb 16 2016 10:02:12 GMT-0800 (PST)] <error message>
     fs.appendFileSync(`./data/scraper-error.log`, `[${currentDate.toString()}] <${err.code}>`);
 
     return;
-    // Current output: [Tue May 30 2017 08:37:29 GMT-0400 (EDT)] <ENOTFOUND>
-    // Required output: [Tue Feb 16 2016 10:02:12 GMT-0800 (PST)] <error message>
   }
 
-  //They should be in this order: Title, Price, ImageURL, URL, and Time
+  //Loop through all scraped data
   for(let i=0; i<obj.length; i++){
 
-    // ['Title', 'Price', 'ImageURL', 'URL', 'Time'];
-
-    //On 200 do all the below
     let csvName = currentDate.getFullYear().toString() + "-" +
                  (currentDate.getMonth()+1).toString() + "-" +
                   currentDate.getDate().toString();
 
-    //ONLY last row is assigned at end of loop
+    // Assume that the the column headers in the CSV need to be in a certain
+      //order to be correctly entered into a database. They should be in this order:
+      //Title, Price, ImageURL, URL, and Time
+
+    //Reset itemRow within looping logic
     let itemRow = {};
+
+    // //Complete logic for the first pass so that the fieldNames are written
+    // if(i === 0){
+    //
+    //   // var fields = ['car', 'price'];
+    //   // let fieldNames = ['Car Name', 'Price USD'];
+    //   let opts = {
+    //     data: [],
+    //     fields: ['Fields'],
+    //     fieldNames: csvFields,
+    //     quotes: ''
+    //   };
+    //   data.title = obj[i].Title;
+    //   data.price = obj[i].Price;
+    //   data.imageURL = obj[i].ImageURL;
+    //   data.url = obj[i].URL;
+    //   data.time = csvName;
+    //   let csv = json2csv(opts);
+    //
+    //   console.log(csv);
+    //
+    //   // fields.push(csvFields);
+    //   // });
+    // }
     itemRow.title = obj[i].Title;
     itemRow.price = obj[i].Price;
     itemRow.imageURL = obj[i].ImageURL;
     itemRow.url = obj[i].URL;
     itemRow.time = csvName;
 
+    //Building the complete list of appropriately ordered scraped data
     fields.push(itemRow);
 
-    fs.writeFileSync(`./data/${csvName}.csv`, JSON.stringify(fields)); //Code needs to append to line in file and use json2csv
-
+    //Write all scraped data to appropriately named CSV file
+    fs.writeFileSync(`./data/${csvName}.csv`, JSON.stringify(fields), function(err){
+      if(err){
+        console.log(`There was an error writing to the file ${csvName}.csv`);
+      }
+      return;
+    }); //Code needs to append to line in file and use json2csv so CSVFields can be included
    }
 })
 
-// Export product data to CSV file in dir './data' in a particular order (see below)
-  //The information should be stored in an CSV file that is named for the date it was created
-  //e.g. 2016-11-21.csv (year-month-day.csv)
-    //Done
 
 // Assume that the the column headers in the CSV need to be in a certain order
   // to be correctly entered into a database.
